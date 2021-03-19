@@ -1,15 +1,20 @@
-add_library(CsSignal SHARED "")
+add_library(CsSignal STATIC "")
 
 target_compile_definitions(
    CsSignal
-   PRIVATE
-   -DBUILDING_LIB_CS_SIGNAL
+   PUBLIC
+   -DLIB_SIG_EXPORT=
 )
 
 target_compile_features(
    CsSignal
    PUBLIC
    cxx_std_17
+)
+
+set_target_properties(CsSignal PROPERTIES
+  COMPILE_PDB_OUTPUT_DIRECTORY "${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}"
+  COMPILE_PDB_NAME CsSignal
 )
 
 target_include_directories(
@@ -47,3 +52,8 @@ install(
    COMPONENT Devel
 )
 
+if (WIN32)
+  install(
+    FILES "$<TARGET_FILE_DIR:CsSignal>/CsSignal.pdb"
+    DESTINATION ${CMAKE_INSTALL_LIBDIR})
+endif()

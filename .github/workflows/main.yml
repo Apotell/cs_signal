@@ -1,0 +1,109 @@
+name: 'main'
+
+on: [ push ]
+
+env:
+  MODULE_NAME: cs_signal
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+        - { os: ubuntu-18.04, artifact-tag: bionic-gcc }
+        - { os: windows-2019, artifact-tag: windows-msvc }
+
+    runs-on: ${{ matrix.config.os }}
+
+    steps:
+    - name: Install Core Dependencies
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update -qq
+        sudo apt install -y g++-9
+        sudo apt install -y cmake
+        sudo apt install -y build-essential
+        sudo apt install -y ninja-build
+
+    - name: Get top commit details
+      uses: actions/github-script@0.3.0
+      id: author-date
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const commit_details = await github.git.getCommit({ owner: context.repo.owner, repo: context.repo.repo, commit_sha: context.sha });
+          return commit_details.data.author.date
+            
+    - name: Setup environment
+      shell: bash
+      run: |
+        git config --global core.autocrlf input
+
+        export COMMITTED_AT=$(date -d ${{ steps.author-date.outputs.result }} +'%Y.%m.%d_%H.%M.%S')
+        export ARTIFACT_NAME=${{ env.MODULE_NAME }}_${{ matrix.config.artifact-tag }}_$COMMITTED_AT
+
+        echo "COMMITTED_AT=$COMMITTED_AT" >> $GITHUB_ENV
+        echo "ARTIFACT_NAME=$ARTIFACT_NAME" >> $GITHUB_ENV
+
+    - name: Pull Source
+      uses: actions/checkout@v2
+
+    - name: Build on Linux
+      if: runner.os == 'Linux'
+      shell: bash
+      env:
+        CC: gcc-9
+        CXX: g++-9
+      run: |
+        env
+        which cmake && cmake --version
+        which ninja && ninja --version
+        which $CC && $CC --version
+        which $CXX && $CXX --version
+
+        cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=out/install/Debug -S . -B out/build/Debug
+        cmake --build out/build/Debug -j `nproc`
+        cmake --install out/build/Debug
+
+        cmake -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=out/install/Release -S . -B out/build/Release
+        cmake --build out/build/Release -j `nproc`
+        cmake --install out/build/Release
+
+    - name: Build on Windows
+      if: runner.os == 'Windows'
+      shell: cmd
+      env:
+        CC: cl
+        CXX: cl
+      run: |
+        call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+
+        set
+        where cmake && cmake --version
+        where ninja && ninja --version
+        where java && java -version
+        where %CC% && %CC%
+        where %CXX% && %CXX%
+
+        cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=out/install/Debug -S . -B out/build/Debug
+        cmake --build out/build/Debug -j %NUMBER_OF_PROCESSORS%
+        cmake --install out/build/Debug
+
+        cmake -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=out/install/Release -S . -B out/build/Release
+        cmake --build out/build/Release -j %NUMBER_OF_PROCESSORS%
+        cmake --install out/build/Release
+
+    - name: Build compressed artifacts
+      shell: bash
+      run: |
+        cd out
+        mv install ${{ env.ARTIFACT_NAME }}
+        tar czfp ${{ env.ARTIFACT_NAME }}.tgz ${{ env.ARTIFACT_NAME }}
+
+    - name: Archive artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ env.ARTIFACT_NAME }}
+        path: out/${{ env.ARTIFACT_NAME }}.tgz
+
