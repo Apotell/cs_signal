@@ -16,22 +16,20 @@
 *
 ***********************************************************************/
 
-#ifndef LIB_CS_MACRO_H
-#define LIB_CS_MACRO_H
+#ifndef CS_SIGNAL_LIB_CS_MACRO_H
+#define CS_SIGNAL_LIB_CS_MACRO_H
 
-#ifdef _WIN32
-
-#ifdef BUILDING_LIB_CS_SIGNAL
-# define LIB_SIG_EXPORT     __declspec(dllexport)
-#else
-# define LIB_SIG_EXPORT     __declspec(dllimport)
+#ifndef CS_SIGNAL_EXPORTS
+  #ifdef _WIN32
+    #ifdef BUILDING_LIB_CS_SIGNAL
+      #define CS_SIGNAL_EXPORTS     __declspec(dllexport)
+    #else
+      #define CS_SIGNAL_EXPORTS     __declspec(dllimport)
+    #endif
+  #else
+    #define CS_SIGNAL_EXPORTS
+  #endif
 #endif
-
-#else
-# define LIB_SIG_EXPORT
-
-#endif
-
 
 // ** signal macros
 #define SIGNAL_1(...)  \

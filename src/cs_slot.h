@@ -16,8 +16,8 @@
 *
 ***********************************************************************/
 
-#ifndef LIB_CS_SLOT_H
-#define LIB_CS_SLOT_H
+#ifndef CS_SIGNAL_LIB_CS_SLOT_H
+#define CS_SIGNAL_LIB_CS_SLOT_H
 
 #include <atomic>
 #include <memory>
@@ -29,7 +29,7 @@
 #include "cs_rcu_guarded.h"
 #include "cs_rcu_list.h"
 
-namespace CsSignal {
+namespace CS_SIGNAL_NS {
 
 class SignalBase;
 class SlotBase;
@@ -40,7 +40,7 @@ namespace Internal {
    class TeaCupAbstract;
 }
 
-class LIB_SIG_EXPORT PendingSlot
+class CS_SIGNAL_EXPORTS PendingSlot
 {
    public:
       PendingSlot(const PendingSlot &) = delete;
@@ -76,7 +76,7 @@ class LIB_SIG_EXPORT PendingSlot
       std::unique_ptr<Internal::TeaCupAbstract> m_teaCup_Data;
 };
 
-class LIB_SIG_EXPORT SlotBase
+class CS_SIGNAL_EXPORTS SlotBase
 {
    public:
       SlotBase();

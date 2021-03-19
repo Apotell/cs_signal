@@ -15,8 +15,8 @@
 *
 ***********************************************************************/
 
-#ifndef CSLIBGUARDED_RCU_LIST_H
-#define CSLIBGUARDED_RCU_LIST_H
+#ifndef CS_SIGNAL_CSLIBGUARDED_RCU_LIST_H
+#define CS_SIGNAL_CSLIBGUARDED_RCU_LIST_H
 
 #include "cs_rcu_guarded.h"
 
@@ -25,7 +25,7 @@
 #include <memory>
 #include <mutex>
 
-namespace libguarded
+namespace CS_SIGNAL_NS::libguarded
 {
 
 /**

@@ -25,7 +25,7 @@
 #include <cs_signal.h>
 #include <cs_slot.h>
 
-class TestPushButton : public CsSignal::SignalBase
+class TestPushButton : public CS_SIGNAL_NS::SignalBase
 {
    public:
       SIGNAL_1(void pressed())
@@ -38,7 +38,7 @@ class TestPushButton : public CsSignal::SignalBase
       SIGNAL_2(toggled, checked)
 };
 
-class Peach : public CsSignal::SlotBase
+class Peach : public CS_SIGNAL_NS::SlotBase
 {
    public:
       Peach();
@@ -52,12 +52,12 @@ class Peach : public CsSignal::SlotBase
 
       int m_slotPressed = 0;
 
-      std::deque<CsSignal::PendingSlot> *m_array;
+      std::deque<CS_SIGNAL_NS::PendingSlot> *m_array;
       std::mutex *m_mutex;
       std::condition_variable *m_alarm;
 
    private:
-      void queueSlot(CsSignal::PendingSlot data, CsSignal::ConnectionKind type) override;
+      void queueSlot(CS_SIGNAL_NS::PendingSlot data, CS_SIGNAL_NS::ConnectionKind type) override;
 };
 
 template<class T>

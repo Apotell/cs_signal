@@ -16,8 +16,8 @@
 *
 ***********************************************************************/
 
-#ifndef LIB_CS_SIGNAL_H
-#define LIB_CS_SIGNAL_H
+#ifndef CS_SIGNAL_LIB_CS_SIGNAL_H
+#define CS_SIGNAL_LIB_CS_SIGNAL_H
 
 #include <algorithm>
 #include <exception>
@@ -34,7 +34,7 @@
 #include "cs_rcu_guarded.h"
 #include "cs_rcu_list.h"
 
-namespace CsSignal {
+namespace CS_SIGNAL_NS {
 
 enum class ConnectionKind {
    AutoConnection,
@@ -48,18 +48,20 @@ enum class DisconnectKind {
    DisconnectOne
 };
 
-template <class Iter1, class Iter2, class T>
-Iter1 find(Iter1 iter1, const Iter2 &iter2, const T &value)
-{
-   while (iter1 != iter2) {
+namespace {
+  template <class Iter1, class Iter2, class T>
+  Iter1 find(Iter1 iter1, const Iter2 &iter2, const T &value)
+  {
+    while (iter1 != iter2) {
       if (value == *iter1) {
-         break;
+        break;
       }
 
       ++iter1;
-   }
+    }
 
-   return iter1;
+    return iter1;
+  }
 }
 
 template<class Sender, class SignalClass, class ...SignalArgs, class Receiver,
@@ -79,7 +81,7 @@ bool connect(const Sender &sender, std::unique_ptr<Internal::BentoAbstract> sign
                   ConnectionKind type = ConnectionKind::AutoConnection, bool uniqueConnection = false);
 
 // base class
-class LIB_SIG_EXPORT SignalBase
+class CS_SIGNAL_EXPORTS SignalBase
 {
    public:
       virtual ~SignalBase();
@@ -156,7 +158,7 @@ void activate(Sender &sender, void (SignalClass::*signal)(SignalArgTypes...), Ts
    const SignalBase *senderPtr = &sender;
 
    // store the signal data, false indicates the data will not be copied
-   CsSignal::Internal::TeaCup_Data<SignalArgTypes...> dataPack(false, std::forward<Ts>(Vs)...);
+   CS_SIGNAL_NS::Internal::TeaCup_Data<SignalArgTypes...> dataPack(false, std::forward<Ts>(Vs)...);
 
    SignalBase *priorSender = SlotBase::get_threadLocal_currentSender();
    SlotBase::get_threadLocal_currentSender() = &sender;
@@ -177,7 +179,7 @@ void activate(Sender &sender, void (SignalClass::*signal)(SignalArgTypes...), Ts
       SlotBase *receiver = const_cast<SlotBase *>(connection.receiver);
 
       // const reference to a unique ptr
-      const std::unique_ptr<const CsSignal::Internal::BentoAbstract> &slot_Bento = connection.slotMethod;
+      const std::unique_ptr<const CS_SIGNAL_NS::Internal::BentoAbstract> &slot_Bento = connection.slotMethod;
 
       bool receiverInSameThread = receiver->compareThreads();
 
@@ -191,7 +193,7 @@ void activate(Sender &sender, void (SignalClass::*signal)(SignalArgTypes...), Ts
 
             // passing true indicates the data will be copied (stored on the heap)
             PendingSlot tempObj(&sender, signal_Bento.clone(), receiver, slot_Bento->clone(),
-                  std::make_unique<CsSignal::Internal::TeaCup_Data<SignalArgTypes...>>(true, std::forward<Ts>(Vs)... ));
+                  std::make_unique<CS_SIGNAL_NS::Internal::TeaCup_Data<SignalArgTypes...>>(true, std::forward<Ts>(Vs)... ));
 
             receiver->queueSlot(std::move(tempObj), ConnectionKind::QueuedConnection);
 
@@ -199,7 +201,7 @@ void activate(Sender &sender, void (SignalClass::*signal)(SignalArgTypes...), Ts
 
             // passing false indicates the data will not be copied
             PendingSlot tempObj(&sender, signal_Bento.clone(), receiver, slot_Bento->clone(),
-                  std::make_unique<CsSignal::Internal::TeaCup_Data<SignalArgTypes...>>(false, std::forward<Ts>(Vs)... ));
+                  std::make_unique<CS_SIGNAL_NS::Internal::TeaCup_Data<SignalArgTypes...>>(false, std::forward<Ts>(Vs)... ));
 
             receiver->queueSlot(std::move(tempObj), ConnectionKind::BlockingQueuedConnection);
 
@@ -513,8 +515,6 @@ bool internal_disconnect(const Sender &sender, const Internal::BentoAbstract *si
    return retval;
 }
 
-}  // namespace
-
 // method pointer cast used to resolve ambiguous method overloading for signals and slots
 
 // 1
@@ -545,5 +545,7 @@ class cs_cmp_cast_internal
 
 template<class... Args>
 constexpr cs_cmp_cast_internal<Args...> cs_cmp_cast;
+
+}  // namespace
 
 #endif

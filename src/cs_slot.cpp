@@ -19,15 +19,15 @@
 #include "cs_signal.h"
 #include "cs_slot.h"
 
-CsSignal::SlotBase::SlotBase()
+CS_SIGNAL_NS::SlotBase::SlotBase()
 {
 }
 
-CsSignal::SlotBase::SlotBase(const SlotBase &)
+CS_SIGNAL_NS::SlotBase::SlotBase(const SlotBase &)
 {
 }
 
-CsSignal::SlotBase::~SlotBase()
+CS_SIGNAL_NS::SlotBase::~SlotBase()
 {
    try {
       // clean up possible sender connections
@@ -54,34 +54,34 @@ CsSignal::SlotBase::~SlotBase()
    }
 }
 
-CsSignal::SignalBase *&CsSignal::SlotBase::get_threadLocal_currentSender()
+CS_SIGNAL_NS::SignalBase *&CS_SIGNAL_NS::SlotBase::get_threadLocal_currentSender()
 {
 #ifdef __APPLE__
-   static __thread CsSignal::SignalBase *threadLocal_currentSender = nullptr;
+   static __thread CS_SIGNAL_NS::SignalBase *threadLocal_currentSender = nullptr;
 #else
-   static thread_local CsSignal::SignalBase *threadLocal_currentSender = nullptr;
+   static thread_local CS_SIGNAL_NS::SignalBase *threadLocal_currentSender = nullptr;
 #endif
 
    return threadLocal_currentSender;
 }
 
-bool CsSignal::SlotBase::compareThreads() const
+bool CS_SIGNAL_NS::SlotBase::compareThreads() const
 {
    return true;
 }
 
-void CsSignal::SlotBase::queueSlot(PendingSlot data, ConnectionKind)
+void CS_SIGNAL_NS::SlotBase::queueSlot(PendingSlot data, ConnectionKind)
 {
    // calls the slot immediately
    data();
 }
 
-CsSignal::SignalBase *CsSignal::SlotBase::sender() const
+CS_SIGNAL_NS::SignalBase *CS_SIGNAL_NS::SlotBase::sender() const
 {
    return get_threadLocal_currentSender();
 }
 
-std::set<CsSignal::SignalBase *> CsSignal::SlotBase::internal_senderList() const
+std::set<CS_SIGNAL_NS::SignalBase *> CS_SIGNAL_NS::SlotBase::internal_senderList() const
 {
    std::set<SignalBase *> retval;
 
@@ -94,7 +94,7 @@ std::set<CsSignal::SignalBase *> CsSignal::SlotBase::internal_senderList() const
    return retval;
 }
 
-CsSignal::PendingSlot::PendingSlot(SignalBase *sender, std::unique_ptr<Internal::BentoAbstract> signal_Bento,
+CS_SIGNAL_NS::PendingSlot::PendingSlot(SignalBase *sender, std::unique_ptr<Internal::BentoAbstract> signal_Bento,
                   SlotBase *receiver, std::unique_ptr<Internal::BentoAbstract> slot_Bento,
                   std::unique_ptr<Internal::TeaCupAbstract> teaCup_Data)
    : m_sender(sender), m_signal_Bento(std::move(signal_Bento)), m_receiver(receiver),
@@ -102,7 +102,7 @@ CsSignal::PendingSlot::PendingSlot(SignalBase *sender, std::unique_ptr<Internal:
 {
 }
 
-void CsSignal::PendingSlot::operator()() const
+void CS_SIGNAL_NS::PendingSlot::operator()() const
 {
    // invoke the slot
    m_slot_Bento->invoke(m_receiver, m_teaCup_Data.get());

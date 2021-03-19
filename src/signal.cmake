@@ -1,15 +1,21 @@
-add_library(CsSignal SHARED "")
+add_library(CsSignal STATIC "")
 
 target_compile_definitions(
    CsSignal
-   PRIVATE
-   -DBUILDING_LIB_CS_SIGNAL
+   PUBLIC
+   -DCS_SIGNAL_EXPORTS=
+   -DCS_SIGNAL_NS=cs_signal
 )
 
 target_compile_features(
    CsSignal
    PUBLIC
    cxx_std_17
+)
+
+set_target_properties(CsSignal PROPERTIES
+  COMPILE_PDB_OUTPUT_DIRECTORY "${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}"
+  COMPILE_PDB_NAME CsSignal
 )
 
 target_sources(CsSignal
@@ -23,19 +29,6 @@ target_include_directories(
    PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
 )
-
-if(MSVC)
-   if (${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.13.0")
-      # ensure method pointers have a unique address
-      target_link_options(CsCore
-         PUBLIC
-         /OPT:REF,NOICF
-      )
-   else()
-      message(FATAL_ERROR "CMake Version must be at least 3.13.0 for MSVC")
-
-   endif()
-endif()
 
 set(CS_SIGNAL_INCLUDE
    ${CMAKE_CURRENT_SOURCE_DIR}/src/cs_internal.h
@@ -56,7 +49,12 @@ install(
 
 install(
    FILES ${CS_SIGNAL_INCLUDE}
-   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/CsSignal
    COMPONENT Devel
 )
 
+if (WIN32)
+  install(
+    FILES "$<TARGET_FILE_DIR:CsSignal>/CsSignal.pdb"
+    DESTINATION ${CMAKE_INSTALL_LIBDIR})
+endif()

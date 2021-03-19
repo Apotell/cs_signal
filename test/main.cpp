@@ -186,7 +186,7 @@ void test_4()
    }
 }
 
-void callBack(std::atomic<bool> &running, std::deque<CsSignal::PendingSlot> &array, std::mutex &mutex,
+void callBack(std::atomic<bool> &running, std::deque<CS_SIGNAL_NS::PendingSlot> &array, std::mutex &mutex,
                   std::condition_variable &alarm)
 {
    printf("  Test 5: Message from thread\n");
@@ -221,7 +221,7 @@ void test_5()
    std::atomic<bool> running;
    running = true;
 
-   std::deque<CsSignal::PendingSlot> array;
+   std::deque<CS_SIGNAL_NS::PendingSlot> array;
    std::mutex mutex;
    std::condition_variable alarm;
 
@@ -234,7 +234,7 @@ void test_5()
 
    TestPushButton okButton;
 
-   connect(okButton, &TestPushButton::pressed, obj, &Peach::threadPressed, CsSignal::ConnectionKind::QueuedConnection);
+   connect(okButton, &TestPushButton::pressed, obj, &Peach::threadPressed, CS_SIGNAL_NS::ConnectionKind::QueuedConnection);
 
    if (obj.m_slotPressed != 0) {
       // ensure the slots were not been accidentally called

@@ -15,12 +15,12 @@
 *
 ***********************************************************************/
 
-#ifndef CSLIBGUARDED_RCU_GUARDED_H
-#define CSLIBGUARDED_RCU_GUARDED_H
+#ifndef CS_SIGNAL_CSLIBGUARDED_RCU_GUARDED_H
+#define CS_SIGNAL_CSLIBGUARDED_RCU_GUARDED_H
 
 #include <memory>
 
-namespace libguarded
+namespace CS_SIGNAL_NS::libguarded
 {
 
 /**

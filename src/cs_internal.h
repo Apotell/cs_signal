@@ -16,8 +16,8 @@
 *
 ***********************************************************************/
 
-#ifndef LIB_CS_INTERNAL_H
-#define LIB_CS_INTERNAL_H
+#ifndef CS_SIGNAL_LIB_CS_INTERNAL_H
+#define CS_SIGNAL_LIB_CS_INTERNAL_H
 
 #include <functional>
 #include <memory>
@@ -25,7 +25,7 @@
 
 #if ! defined (CS_DOXYPRESS)
 
-namespace CsSignal {
+namespace CS_SIGNAL_NS {
 
 class SlotBase;
 
