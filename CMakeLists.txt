@@ -24,6 +24,7 @@ set(BUILD_COMPONENTS "cs_signal")
 
 # catch2 set up
 option(BUILD_TESTS "Enables building the Catch2 unit tests" OFF)
+option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 
 include(CheckCXXCompilerFlag)
 include(CheckCXXSourceCompiles)
@@ -149,7 +150,11 @@ install(
 )
 
 # file locations for building
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+if (BUILD_SHARED_LIBS)
+  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+else()
+  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+endif()
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
