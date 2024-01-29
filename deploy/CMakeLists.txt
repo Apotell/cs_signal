@@ -1,0 +1,51 @@
+cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
+project(CsSignal CXX)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+set(CsSignal_INCLUDES "${PROJECT_SOURCE_DIR}/include")
+
+if(WIN32)
+  set(SYMBOL_FILE_SUFFIX ".pdb")
+elseif(UNIX)
+  set(SYMBOL_FILE_SUFFIX ".so.debug")
+endif()
+
+if (CMAKE_BUILD_TYPE STREQUAL Debug)
+  set(CsSignal_CONFIG_DIRECTORY debug)
+else()
+  set(CsSignal_CONFIG_DIRECTORY release)
+endif()
+
+if (CS_SIGNAL_SHARED_LIBS)
+  add_library(CsSignal SHARED IMPORTED GLOBAL)
+else()
+  add_library(CsSignal STATIC IMPORTED GLOBAL)
+  set(CsSignal_DEFINITIONS
+    LIB_SIG_EXPORT=
+  )
+endif()
+
+if (MSVC)
+  if (CS_SIGNAL_SHARED_LIBS)
+    set(CsSignal_BINDIR "${PROJECT_SOURCE_DIR}/bin/windows-cl-${CsSignal_CONFIG_DIRECTORY}")
+    set_target_properties(CsSignal PROPERTIES
+      INTERFACE_INCLUDE_DIRECTORIES "${CsSignal_INCLUDES}"
+      IMPORTED_IMPLIB "${CsSignal_BINDIR}/${CMAKE_IMPORT_LIBRARY_PREFIX}CsSignal${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+      IMPORTED_LOCATION "${CsSignal_BINDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}CsSignal${CMAKE_SHARED_LIBRARY_SUFFIX}"
+      INTERFACE_COMPILE_DEFINITIONS "${CsSignal_DEFINITIONS}"
+      PDB_NAME "${CMAKE_SHARED_LIBRARY_PREFIX}CsSignal${SYMBOL_FILE_SUFFIX}"
+      PDB_OUTPUT_DIRECTORY "${CsSignal_BINDIR}")
+    )
+  else()
+    set(CsSignal_LIBDIR "${PROJECT_SOURCE_DIR}/lib/windows-cl-${CsSignal_CONFIG_DIRECTORY}")
+    set_target_properties(CsSignal PROPERTIES
+      INTERFACE_INCLUDE_DIRECTORIES "${CsSignal_INCLUDES}"
+      INTERFACE_COMPILE_DEFINITIONS "${CsSignal_DEFINITIONS}"
+      IMPORTED_LOCATION "${CsSignal_LIBDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}CsSignal${CMAKE_SHARED_LIBRARY_SUFFIX}"
+    )
+  endif()
+else()
+endif()

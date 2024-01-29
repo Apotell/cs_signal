@@ -1,15 +1,22 @@
-add_library(CsSignal SHARED "")
+add_library(CsSignal "")
 add_library(CsSignal::CsSignal ALIAS CsSignal)
 
 target_compile_definitions(CsSignal
-   PRIVATE
-   -DBUILDING_LIB_CS_SIGNAL
+   PRIVATE -DBUILDING_LIB_CS_SIGNAL
+   PUBLIC $<$<NOT:$<BOOL:${BUILD_SHARED_LIBS}>>:-DLIB_SIG_EXPORT=>
 )
 
 target_compile_features(CsSignal
    PUBLIC
    cxx_std_17
 )
+
+if (WIN32 AND NOT BUILD_SHARED_LIBS)
+  set_target_properties(CsSignal PROPERTIES
+    COMPILE_PDB_OUTPUT_DIRECTORY "${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}"
+    COMPILE_PDB_NAME CsSignal
+  )
+endif()
 
 if (CsLibGuarded_FOUND)
    # use system headers
@@ -84,7 +91,7 @@ install(
    EXPORT CsSignalLibraryTargets ${INSTALL_TARGETS_DEFAULT_ARGS}
    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+   ARCHIVE DESTINATION "$<IF:$<BOOL:${BUILD_SHARED_LIBS}>,${CMAKE_INSTALL_BINDIR},${CMAKE_INSTALL_LIBDIR}>"
 )
 
 install(
@@ -99,3 +106,10 @@ install(
    FILE CsSignalLibraryTargets.cmake
    DESTINATION ${PKG_PREFIX}
 )
+
+if (WIN32)
+  install(
+    FILES "$<TARGET_FILE_DIR:CsSignal>/CsSignal.pdb"
+    DESTINATION "$<IF:$<BOOL:${BUILD_SHARED_LIBS}>,${CMAKE_INSTALL_BINDIR},${CMAKE_INSTALL_LIBDIR}>"
+    COMPONENT CsSignal)
+endif()
