@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 3.16.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.18.0 FATAL_ERROR)
 
-cmake_policy(VERSION 3.16..3.23)
+cmake_policy(VERSION 3.18.0..3.29.6)
 
 if (${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.19.0")
    # allows spaces in ctest names
@@ -16,9 +16,9 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 
 project(cs_signal)
 
-set(BUILD_MAJOR "1")
-set(BUILD_MINOR "3")
-set(BUILD_MICRO "1")
+set(BUILD_MAJOR "2")
+set(BUILD_MINOR "0")
+set(BUILD_MICRO "0")
 
 set(BUILD_COMPONENTS "cs_signal")
 
@@ -76,7 +76,7 @@ include(CPack)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_INCLUDE_DIRECTORIES_BEFORE ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
    set(CMAKE_EXE_LINKER_FLAGS    "${CMAKE_EXE_LINKER_FLAGS}    -Wl,-undefined,error")

@@ -8,7 +8,7 @@ target_compile_definitions(CsSignal
 
 target_compile_features(CsSignal
    PUBLIC
-   cxx_std_17
+   cxx_std_20
 )
 
 if (WIN32 AND NOT BUILD_SHARED_LIBS)
